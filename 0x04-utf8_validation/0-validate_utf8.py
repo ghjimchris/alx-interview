@@ -1,55 +1,38 @@
 #!/usr/bin/python3
-
 """
-This module provides the function validUTF8(data)
+Method to determine if given data represents valid UTF-8 encoding
+Prototype: def validUTF8(data)
+Returns True if data is valid UTF-8 encoding, else return False
+Dataset can contain multiple characters
+Data will represent a list of integers
 """
-
-
-def convertToBinary(data):
-    """
-    This function converts a list of decimals to
-    a list of utf-8 binaries
-    """
-    i = 0
-    byte = data
-    byte = bin(byte)[2:]
-    if len(byte) < 8:
-        byte = '0'*(8 - len(byte)) + byte
-    return byte
 
 
 def validUTF8(data):
     """
-    This function validates a data set
-    to represents a valid UTF-8 encoding
+    Prototype: def validUTF8(data)
+    Returns True if data is valid UTF-8 encoding
+    else return False
     """
-    if data is None or len(data) == 0:
+    count = 0
+
+    for bit in data:
+        binary = bin(bit).replace('0b', '').rjust(8, '0')[-8:]
+        if count == 0:
+            if binary.startswith('110'):
+                count = 1
+            if binary.startswith('1110'):
+                count = 2
+            if binary.startswith('11110'):
+                count = 3
+            if binary.startswith('10'):
+                return False
+        else:
+            if not binary.startswith('10'):
+                return False
+            count -= 1
+
+    if count != 0:
         return False
-    if type(data) != list:
-        return False
-    if not isinstance(all(data), int):
-        return False
-    data = list(map(convertToBinary, data))
-    i = 0
-    while i < len(data):
-        byte = data[i]
-        if len(byte) > 8:
-            return False
-        if byte[0] == '0':
-            i += 1
-            continue
-        numOfBytes = 0
-        for j in range(len(byte)):
-            if byte[j] == '0':
-                numOfBytes = j
-                if i + j > len(data):
-                    return False
-                for a in range(1, numOfBytes):
-                    a += i
-                    nextByte = data[a]
-                    if nextByte[0] != '1' or nextByte[1] != '0':
-                        return False
-                i += j - 1
-                break
-        i += 1
+
     return True
