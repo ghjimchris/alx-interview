@@ -1,61 +1,64 @@
 #!/usr/bin/python3
-""" Prime Game """
 
-
-def isprime(n):
-    """ Return prime number """
-    for i in range(2, n):
-        if n % i == 0:
-            return False
-    return True
-
-
-def delete_numbers(n, nums):
-    """ Remove numbers - return zero """
-    for i in range(len(nums)):
-        if nums[i] % n == 0:
-            nums[i] = 0
+"""
+This module provides the function `isWinner`
+"""
 
 
 def isWinner(x, nums):
-    """ Return name of player that won
-    most rounds
     """
-    nums.sort()
-    winner = False
-    Maria = 0
-    Ben = 0
-    for game in range(x):
-        # prints("game# ", game+1)
-        nums2 = list(range(1, nums[game] + 1))
-        # print("nums: ", nums2)
-        turn = 0
-        while True:
+    This function plays the primegame between
+    two players and returns the winner
+    """
+    if x is None or nums is None:
+        return
+    if not isinstance(x, int):
+        return
+    if type(nums) != list:
+        return
+    if len(nums) != x:
+        return
+
+    class PrimeGame:
+        """ A class for playaing Prime game """
+        def __init__(self, X, Nums):
+            self.x = X
+            self.nums = Nums
+            self.Ben = 0
+            self.Maria = 0
+            self.roundList = []
+
+        @staticmethod
+        def checkPrime(k):
             """
-            # monitor turns, uncomment to watch
-            if turn % 2 != 0:
-                print("Ben turn ")
-            else:
-                print("Maria turn ")
+            checks if the input x is a prime number
             """
-            change = False
-            for i, n in enumerate(nums2):
-                # print("n: ", n, "i: ", i)
-                if n > 1 and isprime(n):
-                    delete_numbers(n, nums2)
-                    change = True
-                    turn += 1
-                    break
-            # print("movement: ". nums2)
-            if change is False:
-                break
-        if turn % 2 != 0:
-            Maria += 1
-        else:
-            Ben += 1
-        # print("Maria: {}, Ben: {}".format(Maria, Ben))
-    if Maria == Ben:
-        return None
-    if Maria > Ben:
-        return "Maria"
-    return "Ben"
+            if k == 1:
+                return False
+            for i in range(2, int(k / 2) + 1):
+                if k % i == 0:
+                    return False
+            return True
+
+        def play(self):
+            """
+            Starts the gameplay to determine the winner
+            """
+            for n in self.nums:
+                self.roundList = [i for i in range(1, n + 1)]
+                self.roundList = list(filter(self.checkPrime, self.roundList))
+                numOfPrime = len(self.roundList)
+                if numOfPrime % 2 == 0:
+                    self.Ben += 1
+                else:
+                    self.Maria += 1
+
+    game = PrimeGame(x, nums)
+    game.play()
+
+    if game.Ben > game.Maria:
+        return 'Ben'
+    elif game.Maria > game.Ben:
+        return 'Maria'
+    else:
+        return
